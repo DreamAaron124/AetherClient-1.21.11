@@ -9,7 +9,7 @@ import net.minecraft.block.entity.BlockEntity;
 
 public final class StorageFinder {
     public static void init() {
-        WorldRenderEvents.AFTER_ENTITIES.register(context -> {
+        WorldRenderEvents.END_EXTRACTION.register(context -> {
             ModuleConfig c = AetherClient.CONFIG.storage;
             if (!c.enabled || AetherClient.client().world == null || AetherClient.client().player == null) return;
             double rangeSq = (double)c.range * c.range;
@@ -19,7 +19,7 @@ public final class StorageFinder {
                 if (player.squaredDistanceTo(pos.getX()+0.5, pos.getY()+0.5, pos.getZ()+0.5) > rangeSq) continue;
                 var b = be.getCachedState().getBlock();
                 if (b == Blocks.CHEST || b == Blocks.TRAPPED_CHEST || b == Blocks.BARREL || b == Blocks.SHULKER_BOX ||
-                    b == Blocks.HOPPER || b == Blocks.DROPPER || b == Blocks.DISPENSER) BlockFinderRenderer.draw(context, pos, c);
+                    b == Blocks.HOPPER || b == Blocks.DROPPER || b == Blocks.DISPENSER) BlockFinderRenderer.draw(pos, c);
             }
         });
     }
