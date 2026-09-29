@@ -81,7 +81,8 @@ public final class ClickGuiScreen extends Screen {
     private void text(DrawContext d,String s,int x,int y,int color,int bold){ d.drawTextWithShadow(textRenderer,Text.literal(s),x,y,color); }
 
     @Override
-    public boolean mouseClicked(Click click, boolean doubled) {\n        double mx=click.x(), my=click.y(); int button=click.button();
+    public boolean mouseClicked(Click click, boolean doubled) {
+        double mx=click.x(), my=click.y(); int button=click.button();
         int x=Math.max(50,width/2-430), y=Math.max(35,height/2-255), sideW=190, pw=Math.min(860,width-100);
         if(button!=0) return super.mouseClicked(click,doubled);
         if(mx>=x+12&&mx<=x+sideW-12) for(int i=0;i<modules.length;i++){ int by=y+98+i*48; if(my>=by&&my<=by+38){selected=i; return true;} }
