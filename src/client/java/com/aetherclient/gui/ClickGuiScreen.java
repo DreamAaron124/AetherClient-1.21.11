@@ -2,6 +2,7 @@ package com.aetherclient.gui;
 
 import com.aetherclient.AetherClient;
 import com.aetherclient.config.ClientConfig.ModuleConfig;
+import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
 import net.minecraft.text.Text;
@@ -80,9 +81,9 @@ public final class ClickGuiScreen extends Screen {
     private void text(DrawContext d,String s,int x,int y,int color,int bold){ d.drawTextWithShadow(textRenderer,Text.literal(s),x,y,color); }
 
     @Override
-    public boolean mouseClicked(double mx,double my,int button) {
+    public boolean mouseClicked(Click click, boolean doubled) {\n        double mx=click.x(), my=click.y(); int button=click.button();
         int x=Math.max(50,width/2-430), y=Math.max(35,height/2-255), sideW=190, pw=Math.min(860,width-100);
-        if(button!=0) return super.mouseClicked(mx,my,button);
+        if(button!=0) return super.mouseClicked(click,doubled);
         if(mx>=x+12&&mx<=x+sideW-12) for(int i=0;i<modules.length;i++){ int by=y+98+i*48; if(my>=by&&my<=by+38){selected=i; return true;} }
         int cx=x+sideW+26, cy=y+78;
         if(mx>=x+pw-sideW-88&&mx<=x+pw-sideW-34&&my>=cy-2&&my<=cy+24){cfg().enabled=!cfg().enabled;AetherClient.saveConfig();return true;}
@@ -100,7 +101,7 @@ public final class ClickGuiScreen extends Screen {
     }
     private String nextMode(String s){return switch(s){case "OUTLINE"->"CORNERS";case "CORNERS"->"FULL_BOX";default->"OUTLINE";};}
     private void updateSlider(double mx,int x,int width,int min,int max){double t=Math.max(0,Math.min(1,(mx-x)/(double)width));int v=(int)Math.round(min+t*(max-min)); if(min==8)cfg().range=v; else if(min==0)cfg().outlineOpacity=v/100f; else cfg().lineWidth=v/10f; AetherClient.saveConfig();}
-    @Override public boolean mouseDragged(double mx,double my,int button,double dx,double dy){if(button==0){int x=Math.max(50,width/2-430),cx=x+216,cy=Math.max(35,height/2-255)+78;if(draggingRange)updateSlider(mx,cx-98,250,8,128);if(draggingOpacity)updateSlider(mx,cx-98,250,0,100);if(draggingLine)updateSlider(mx,cx-98,250,5,40);return true;}return super.mouseDragged(mx,my,button,dx,dy);}
-    @Override public boolean mouseReleased(double mx,double my,int button){draggingRange=draggingOpacity=draggingLine=false;return super.mouseReleased(mx,my,button);}
+    @Override public boolean mouseDragged(Click click,double dx,double dy){double mx=click.x(), my=click.y(); int button=click.button(); if(button==0){int x=Math.max(50,width/2-430),cx=x+216,cy=Math.max(35,height/2-255)+78;if(draggingRange)updateSlider(mx,cx-98,250,8,128);if(draggingOpacity)updateSlider(mx,cx-98,250,0,100);if(draggingLine)updateSlider(mx,cx-98,250,5,40);return true;}return super.mouseDragged(click,dx,dy);}
+    @Override public boolean mouseReleased(Click click){draggingRange=draggingOpacity=draggingLine=false;return super.mouseReleased(click);}
     @Override public boolean shouldPause(){return false;}
 }
