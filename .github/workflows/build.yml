@@ -1,0 +1,33 @@
+name: Build Aether Client
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Java 21
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "21"
+
+      - name: Setup Gradle 9.2.1
+        uses: gradle/actions/setup-gradle@v6
+        with:
+          gradle-version: "9.2.1"
+
+      - name: Build
+        run: gradle build --no-daemon
+
+      - name: Upload Aether Client JAR
+        uses: actions/upload-artifact@v4
+        with:
+          name: Aether-Client-1.21.11
+          path: build/libs/*.jar
+          if-no-files-found: error
