@@ -1,0 +1,16 @@
+{
+  "schemaVersion": 1,
+  "id": "aetherclient",
+  "version": "${version}",
+  "name": "Aether Client",
+  "description": "A clean client-side Fabric utility client with an aesthetic ClickGUI and configurable block finders.",
+  "authors": ["Aether Client"],
+  "environment": "client",
+  "entrypoints": { "client": ["com.aetherclient.AetherClient"] },
+  "depends": {
+    "fabricloader": ">=0.18.0",
+    "minecraft": "~1.21.11",
+    "java": ">=21",
+    "fabric-api": ">=0.141.0"
+  }
+}
