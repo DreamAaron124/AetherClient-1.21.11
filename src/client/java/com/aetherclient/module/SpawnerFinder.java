@@ -9,7 +9,7 @@ import net.minecraft.block.entity.BlockEntity;
 
 public final class SpawnerFinder {
     public static void init() {
-        WorldRenderEvents.AFTER_ENTITIES.register(context -> {
+        WorldRenderEvents.END_EXTRACTION.register(context -> {
             ModuleConfig c = AetherClient.CONFIG.spawner;
             if (!c.enabled || AetherClient.client().world == null || AetherClient.client().player == null) return;
             double rangeSq = (double)c.range * c.range;
@@ -17,7 +17,7 @@ public final class SpawnerFinder {
             for (BlockEntity be : AetherClient.client().world.getBlockEntities()) {
                 var pos = be.getPos();
                 if (player.squaredDistanceTo(pos.getX()+0.5, pos.getY()+0.5, pos.getZ()+0.5) > rangeSq) continue;
-                if (be.getCachedState().isOf(Blocks.SPAWNER)) BlockFinderRenderer.draw(context, pos, c);
+                if (be.getCachedState().isOf(Blocks.SPAWNER)) BlockFinderRenderer.draw(pos, c);
             }
         });
     }
