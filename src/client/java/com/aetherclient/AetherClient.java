@@ -9,6 +9,7 @@ import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
 import net.minecraft.client.MinecraftClient;
 import net.minecraft.client.option.KeyBinding;
+import net.minecraft.util.Identifier;
 import org.lwjgl.glfw.GLFW;
 
 public final class AetherClient implements ClientModInitializer {
@@ -18,11 +19,12 @@ public final class AetherClient implements ClientModInitializer {
     @Override
     public void onInitializeClient() {
         clickGuiKey = KeyBindingHelper.registerKeyBinding(new KeyBinding(
-                "key.aetherclient.clickgui", GLFW.GLFW_KEY_RIGHT_SHIFT, "category.aetherclient"));
-
+                "key.aetherclient.clickgui",
+                GLFW.GLFW_KEY_RIGHT_SHIFT,
+                KeyBinding.Category.create(Identifier.of("aetherclient", "category"))
+        ));
         StorageFinder.init();
         SpawnerFinder.init();
-
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (clickGuiKey.wasPressed() && client.currentScreen == null) {
                 client.setScreen(new ClickGuiScreen());
