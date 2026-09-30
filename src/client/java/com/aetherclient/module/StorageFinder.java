@@ -14,12 +14,14 @@ public final class StorageFinder {
             if (!c.enabled || AetherClient.client().world == null || AetherClient.client().player == null) return;
             double rangeSq = (double)c.range * c.range;
             var player = AetherClient.client().player;
-            for (BlockEntity be : AetherClient.client().world.getBlockEntities()) {
-                var pos = be.getPos();
-                if (player.squaredDistanceTo(pos.getX()+0.5, pos.getY()+0.5, pos.getZ()+0.5) > rangeSq) continue;
-                var b = be.getCachedState().getBlock();
-                if (b == Blocks.CHEST || b == Blocks.TRAPPED_CHEST || b == Blocks.BARREL || b == Blocks.SHULKER_BOX ||
-                    b == Blocks.HOPPER || b == Blocks.DROPPER || b == Blocks.DISPENSER) BlockFinderRenderer.draw(pos, c);
+            try (var ignored = AetherClient.client().worldRenderer.startDrawingGizmos()) {
+                for (BlockEntity be : AetherClient.client().world.getBlockEntities()) {
+                    var pos = be.getPos();
+                    if (player.squaredDistanceTo(pos.getX()+0.5, pos.getY()+0.5, pos.getZ()+0.5) > rangeSq) continue;
+                    var b = be.getCachedState().getBlock();
+                    if (b == Blocks.CHEST || b == Blocks.TRAPPED_CHEST || b == Blocks.BARREL || b == Blocks.SHULKER_BOX ||
+                        b == Blocks.HOPPER || b == Blocks.DROPPER || b == Blocks.DISPENSER) BlockFinderRenderer.draw(pos, c);
+                }
             }
         });
     }
