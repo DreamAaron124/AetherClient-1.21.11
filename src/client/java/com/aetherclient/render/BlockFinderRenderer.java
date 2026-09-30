@@ -16,11 +16,17 @@ public final class BlockFinderRenderer {
 
         switch (c.mode) {
             case "FULL_BOX" -> GizmoDrawing.box(box,
-                    DrawStyle.filledAndStroked(stroke, Math.max(1.0f, c.lineWidth), fill));
+                    DrawStyle.filledAndStroked(stroke, Math.max(1.0f, c.lineWidth), fill))
+                    .ignoreOcclusion()
+                    .withLifespan(1);
             case "CORNERS" -> GizmoDrawing.box(box,
-                    DrawStyle.stroked(stroke, Math.max(1.0f, c.lineWidth)), true);
+                    DrawStyle.stroked(stroke, Math.max(1.0f, c.lineWidth)), true)
+                    .ignoreOcclusion()
+                    .withLifespan(1);
             default -> GizmoDrawing.box(box,
-                    DrawStyle.stroked(stroke, Math.max(1.0f, c.lineWidth)));
+                    DrawStyle.stroked(stroke, Math.max(1.0f, c.lineWidth)))
+                    .ignoreOcclusion()
+                    .withLifespan(1);
         }
     }
 
