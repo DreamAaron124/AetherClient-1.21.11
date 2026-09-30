@@ -2,7 +2,6 @@ package com.aetherclient.gui;
 
 import com.aetherclient.AetherClient;
 import com.aetherclient.config.ClientConfig.ModuleConfig;
-import com.aetherclient.module.Freecam;
 import net.minecraft.client.gui.Click;
 import net.minecraft.client.gui.DrawContext;
 import net.minecraft.client.gui.screen.Screen;
@@ -14,10 +13,10 @@ public final class ClickGuiScreen extends Screen {
     private boolean draggingRange = false;
     private boolean draggingLine = false;
     private double scrollOffset = 0;
-    private final String[] modules = {"Storage Finder", "Spawner Finder", "Freecam"};
+    private final String[] modules = {"Storage Finder", "Spawner Finder"};
 
     public ClickGuiScreen() { super(Text.literal("Aether Client")); }
-    private ModuleConfig cfg() { return selected == 0 ? AetherClient.CONFIG.storage : selected == 1 ? AetherClient.CONFIG.spawner : AetherClient.CONFIG.freecam; }
+    private ModuleConfig cfg() { return selected == 0 ? AetherClient.CONFIG.storage : AetherClient.CONFIG.spawner; }
 
     @Override
     protected void init() { }
@@ -51,7 +50,7 @@ public final class ClickGuiScreen extends Screen {
 
         int cx=x+sideW+26, cy=(int)(y+78+scrollOffset);
         text(d,modules[selected],cx,cy,0xFFF2F6FC,1);
-        text(d,selected==0?"Locate storage blocks through the world":selected==1?"Locate mob spawners through the world":"Detach the camera and fly around locally",cx,cy+20,0xFF778398,0);
+        text(d,selected==0?"Locate storage blocks through the world":"Locate mob spawners through the world",cx,cy+20,0xFF778398,0);
         drawToggle(d,cfg(),cx+pw-sideW-88,cy-2);
 
         section(d,"RENDER",cx,cy+58,pw-sideW-52);
@@ -69,7 +68,7 @@ public final class ClickGuiScreen extends Screen {
         d.fill(cx+500,cy+374,cx+pw-sideW-38,cy+410,(cfg().red<<16)|(cfg().green<<8)|cfg().blue);
         text(d,"LIVE",cx+510,cy+388,0xFFFFFFFF,1);
 
-        text(d,selected==0?"Storage: chest • trapped chest • barrel • shulker • hopper • dropper • dispenser":selected==1?"Spawner Finder: mob spawners":"Freecam: Right Alt to toggle • WASD move • Space/Ctrl vertical",cx,y+ph-26,0xFF536074,0);
+        text(d,"Storage: chest • trapped chest • barrel • shulker • hopper • dropper • dispenser",cx,y+ph-26,0xFF536074,0);
         super.render(d,mouseX,mouseY,delta);
     }
 
