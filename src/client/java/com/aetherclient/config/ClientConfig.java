@@ -10,6 +10,7 @@ import net.fabricmc.loader.api.FabricLoader;
 public final class ClientConfig {
     public ModuleConfig storage = ModuleConfig.storageDefaults();
     public ModuleConfig spawner = ModuleConfig.spawnerDefaults();
+    public ModuleConfig freecam = ModuleConfig.freecamDefaults();
 
     private static final Gson GSON = new GsonBuilder().setPrettyPrinting().create();
     private static Path path() { return FabricLoader.getInstance().getConfigDir().resolve("aetherclient.json"); }
@@ -39,6 +40,9 @@ public final class ClientConfig {
 
         static ModuleConfig storageDefaults() {
             ModuleConfig c = new ModuleConfig(); c.enabled = true; c.red = 70; c.green = 180; c.blue = 255; return c;
+        }
+        static ModuleConfig freecamDefaults() {
+            ModuleConfig c = new ModuleConfig(); c.enabled = false; c.range = 0; return c;
         }
         static ModuleConfig spawnerDefaults() {
             ModuleConfig c = new ModuleConfig(); c.enabled = true; c.mode = "CORNERS"; c.red = 205; c.green = 90; c.blue = 255; return c;
