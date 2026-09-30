@@ -17,7 +17,15 @@ public final class ClientConfig {
 
     public static ClientConfig load() {
         try {
-            if (Files.exists(path())) return GSON.fromJson(Files.readString(path()), ClientConfig.class);
+            if (Files.exists(path())) {
+                ClientConfig loaded = GSON.fromJson(Files.readString(path()), ClientConfig.class);
+                if (loaded != null) {
+                    if (loaded.storage == null) loaded.storage = ModuleConfig.storageDefaults();
+                    if (loaded.spawner == null) loaded.spawner = ModuleConfig.spawnerDefaults();
+                    if (loaded.freecam == null) loaded.freecam = ModuleConfig.freecamDefaults();
+                    return loaded;
+                }
+            }
         } catch (Exception ignored) { }
         return new ClientConfig();
     }
