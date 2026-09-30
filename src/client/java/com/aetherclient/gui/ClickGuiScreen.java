@@ -12,6 +12,7 @@ public final class ClickGuiScreen extends Screen {
     private boolean draggingOpacity = false;
     private boolean draggingRange = false;
     private boolean draggingLine = false;
+    private double scrollOffset = 0;
     private final String[] modules = {"Storage Finder", "Spawner Finder"};
 
     public ClickGuiScreen() { super(Text.literal("Aether Client")); }
@@ -47,7 +48,7 @@ public final class ClickGuiScreen extends Screen {
         text(d,"Saved automatically",x+20,y+252,0xFF556073,0);
         text(d,"Right Shift  •  close",x+20,y+274,0xFF556073,0);
 
-        int cx=x+sideW+26, cy=y+78;
+        int cx=x+sideW+26, cy=(int)(y+78+scrollOffset);
         text(d,modules[selected],cx,cy,0xFFF2F6FC,1);
         text(d,selected==0?"Locate storage blocks through the world":"Locate mob spawners through the world",cx,cy+20,0xFF778398,0);
         drawToggle(d,cfg(),cx+pw-sideW-88,cy-2);
@@ -104,5 +105,16 @@ public final class ClickGuiScreen extends Screen {
     private void updateSlider(double mx,int x,int width,int min,int max){double t=Math.max(0,Math.min(1,(mx-x)/(double)width));int v=(int)Math.round(min+t*(max-min)); if(min==8)cfg().range=v; else if(min==0)cfg().outlineOpacity=v/100f; else cfg().lineWidth=v/10f; AetherClient.saveConfig();}
     @Override public boolean mouseDragged(Click click,double dx,double dy){double mx=click.x(), my=click.y(); int button=click.button(); if(button==0){int x=Math.max(50,width/2-430),cx=x+216,cy=Math.max(35,height/2-255)+78;if(draggingRange)updateSlider(mx,cx-98,250,8,128);if(draggingOpacity)updateSlider(mx,cx-98,250,0,100);if(draggingLine)updateSlider(mx,cx-98,250,5,40);return true;}return super.mouseDragged(click,dx,dy);}
     @Override public boolean mouseReleased(Click click){draggingRange=draggingOpacity=draggingLine=false;return super.mouseReleased(click);}
+
+    @Override
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        int x=Math.max(50,width/2-430), y=Math.max(35,height/2-255);
+        int pw=Math.min(860,width-100), ph=Math.min(510,height-70), sideW=190;
+        if (mouseX >= x+sideW && mouseX <= x+pw && mouseY >= y+54 && mouseY <= y+ph) {
+            scrollOffset = Math.max(-220, Math.min(0, scrollOffset + verticalAmount * 28));
+            return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
+    }
     @Override public boolean shouldPause(){return false;}
 }
