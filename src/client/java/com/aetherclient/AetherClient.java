@@ -3,6 +3,7 @@ package com.aetherclient;
 import com.aetherclient.config.ClientConfig;
 import com.aetherclient.gui.ClickGuiScreen;
 import com.aetherclient.module.SpawnerFinder;
+import com.aetherclient.module.Freecam;
 import com.aetherclient.module.StorageFinder;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
@@ -25,6 +26,7 @@ public final class AetherClient implements ClientModInitializer {
         ));
         StorageFinder.init();
         SpawnerFinder.init();
+        Freecam.init();
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (clickGuiKey.wasPressed() && client.currentScreen == null) {
                 client.setScreen(new ClickGuiScreen());
