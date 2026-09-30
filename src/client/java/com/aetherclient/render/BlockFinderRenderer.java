@@ -25,6 +25,9 @@ public final class BlockFinderRenderer {
 
     public static void draw(WorldRenderContext context, BlockPos pos, ModuleConfig c) {
         VertexConsumer v = context.consumers().getBuffer(ESP_LINES);
+        var camera = context.worldState().cameraRenderState.pos;
+        context.matrices().push();
+        context.matrices().translate(-camera.x, -camera.y, -camera.z);
         Matrix4f matrix = context.matrices().peek().positionMatrix();
         Box b = new Box(pos);
 
@@ -34,6 +37,7 @@ public final class BlockFinderRenderer {
         float a = Math.max(0.05f, Math.min(1.0f, c.outlineOpacity));
 
         drawBox(v, matrix, b, r, g, bl, a, c.lineWidth);
+        context.matrices().pop();
     }
 
     private static void drawBox(VertexConsumer v, Matrix4f m, Box b, float r, float g, float bl, float a, float width) {
