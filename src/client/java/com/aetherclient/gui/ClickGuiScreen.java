@@ -89,7 +89,12 @@ public final class ClickGuiScreen extends Screen {
         if(mx>=x+12&&mx<=x+sideW-12) for(int i=0;i<modules.length;i++){ int by=y+98+i*48; if(my>=by&&my<=by+38){selected=i; return true;} }
         int cx=x+sideW+26, cy=(int)(y+78+scrollOffset);
         int toggleX=x+pw-sideW-88, toggleY=cy-2;
-        if(mx>=toggleX&&mx<=toggleX+54&&my>=toggleY&&my<=toggleY+26){cfg().enabled=!cfg().enabled;AetherClient.saveConfig();return true;}
+        // Make the ESP toggle easy to hit: the whole module header and switch are clickable.
+        if(mx>=cx && mx<=x+pw-12 && my>=cy-8 && my<=cy+38){
+            cfg().enabled=!cfg().enabled;
+            AetherClient.saveConfig();
+            return true;
+        }
         if(mx>=cx+118&&mx<=cx+246&&my>=cy+80&&my<=cy+110){ cfg().mode=nextMode(cfg().mode); AetherClient.saveConfig(); return true; }
         if(my>=cy+140&&my<=cy+164){draggingRange=true;updateSlider(mx,cx+118,250,8,128);return true;}
         if(my>=cy+188&&my<=cy+212){draggingOpacity=true;updateSlider(mx,cx+118,250,0,100);return true;}
