@@ -1,6 +1,5 @@
 package com.aetherclient.render;
 
-import com.aetherclient.AetherClient;
 import com.aetherclient.config.ClientConfig.ModuleConfig;
 import net.minecraft.client.render.DrawStyle;
 import net.minecraft.util.math.BlockPos;
@@ -15,22 +14,13 @@ public final class BlockFinderRenderer {
         int fill = argb(c.fillOpacity, c.red, c.green, c.blue);
         Box box = new Box(pos);
 
-        try (var ignored = AetherClient.client().worldRenderer.startDrawingGizmos()) {
-            switch (c.mode) {
-                case "FULL_BOX" -> GizmoDrawing.box(
-                        box,
-                        DrawStyle.filledAndStroked(stroke, Math.max(1.0f, c.lineWidth), fill)
-                );
-                case "CORNERS" -> GizmoDrawing.box(
-                        box,
-                        DrawStyle.stroked(stroke, Math.max(1.0f, c.lineWidth)),
-                        true
-                );
-                default -> GizmoDrawing.box(
-                        box,
-                        DrawStyle.stroked(stroke, Math.max(1.0f, c.lineWidth))
-                );
-            }
+        switch (c.mode) {
+            case "FULL_BOX" -> GizmoDrawing.box(box,
+                    DrawStyle.filledAndStroked(stroke, Math.max(1.0f, c.lineWidth), fill));
+            case "CORNERS" -> GizmoDrawing.box(box,
+                    DrawStyle.stroked(stroke, Math.max(1.0f, c.lineWidth)), true);
+            default -> GizmoDrawing.box(box,
+                    DrawStyle.stroked(stroke, Math.max(1.0f, c.lineWidth)));
         }
     }
 
