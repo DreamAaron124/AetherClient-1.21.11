@@ -11,10 +11,10 @@ public final class SpawnerFinder {
     public static void init() {
         WorldRenderEvents.BEFORE_DEBUG_RENDER.register(context -> {
             ModuleConfig c = AetherClient.CONFIG.spawner;
-            if (!c.enabled || context.worldState().world == null || AetherClient.client().player == null) return;
+            if (!c.enabled || AetherClient.client().world == null || AetherClient.client().player == null) return;
             double rangeSq = (double)c.range * c.range;
             var player = AetherClient.client().player;
-            for (BlockEntity be : context.worldState().world.getBlockEntities()) {
+            for (BlockEntity be : AetherClient.client().world.getBlockEntities()) {
                 var pos = be.getPos();
                 if (player.squaredDistanceTo(pos.getX()+0.5, pos.getY()+0.5, pos.getZ()+0.5) > rangeSq) continue;
                 if (be.getCachedState().isOf(Blocks.SPAWNER)) BlockFinderRenderer.draw(context, pos, c);
