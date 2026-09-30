@@ -21,6 +21,8 @@ public final class Freecam {
     private Freecam() {}
 
     public static void init() {
+        AetherClient.CONFIG.freecam.enabled = false;
+        AetherClient.saveConfig();
         key = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.aetherclient.freecam",
                 GLFW.GLFW_KEY_RIGHT_ALT,
@@ -30,14 +32,18 @@ public final class Freecam {
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.world == null || client.player == null) return;
 
-            if (key.wasPressed()) {
-                if (camera == null) enable(client.player);
-                else disable(client.player);
-            }
+            if (key.wasPressed()) toggle(client.player);
 
             if (camera != null) tickCamera(client.player);
         });
     }
+
+    public static void toggle(ClientPlayerEntity player) {
+        if (camera == null) enable(player);
+        else disable(player);
+    }
+
+    public static boolean isEnabled() { return camera != null; }
 
     private static void enable(ClientPlayerEntity player) {
         savedX = player.getX();
