@@ -18,7 +18,8 @@ public final class ClickGuiScreen extends Screen {
     public ClickGuiScreen() { super(Text.literal("Aether Client")); }
     private ModuleConfig cfg() { return selected == 0 ? AetherClient.CONFIG.storage : AetherClient.CONFIG.spawner; }
 
-    @Override protected void init() { }
+    @Override
+    protected void init() { }
 
     @Override
     public void render(DrawContext d, int mouseX, int mouseY, float delta) {
@@ -66,6 +67,7 @@ public final class ClickGuiScreen extends Screen {
         label(d,"B",cx+340,cy+370); slider(d,cx+388,cy+382,95,cfg().blue,0,255,false);
         d.fill(cx+500,cy+374,cx+pw-sideW-38,cy+410,(cfg().red<<16)|(cfg().green<<8)|cfg().blue);
         text(d,"LIVE",cx+510,cy+388,0xFFFFFFFF,1);
+
         text(d,"Storage: chest • trapped chest • barrel • shulker • hopper • dropper • dispenser",cx,y+ph-26,0xFF536074,0);
         super.render(d,mouseX,mouseY,delta);
     }
@@ -74,7 +76,9 @@ public final class ClickGuiScreen extends Screen {
     private void label(DrawContext d,String s,int x,int y){ text(d,s,x,y,0xFFB2BDCC,0); }
     private void button(DrawContext d,String s,int x,int y,int w,int h){ d.fill(x,y,x+w,y+h,0xFF172231); d.fill(x,y,x+w,y+1,0xFF2B3B51); text(d,s,x+12,y+10,0xFFDAE6F5,0); text(d,"‹ ›",x+w-26,y+10,0xFF6F7E94,0); }
     private void drawToggle(DrawContext d,ModuleConfig c,int x,int y){ d.fill(x,y,x+54,y+26,c.enabled?0xFF477FBD:0xFF293241); d.fill(x+(c.enabled?30:4),y+4,x+(c.enabled?50:24),y+22,0xFFF2F6FC); text(d,c.enabled?"ON":"OFF",x-34,y+8,c.enabled?0xFF6FB7FF:0xFF6E7788,0); }
-    private void slider(DrawContext d,int x,int y,int width,int value,int min,int max,boolean active){ d.fill(x,y+6,x+width,y+9,0xFF293342); int px=x+(int)((value-min)/(double)(max-min)*width); d.fill(x,y+6,px,y+9,0xFF6FB7FF); d.fill(px-5,y+1,px+5,y+14,active?0xFFFFFFFF:0xFFB8D9FF); text(d,String.valueOf(value),x+width+10,y+2,0xFF77859A,0); }
+    private void slider(DrawContext d,int x,int y,int width,int value,int min,int max,boolean active){
+        d.fill(x,y+6,x+width,y+9,0xFF293342); int px=x+(int)((value-min)/(double)(max-min)*width); d.fill(x,y+6,px,y+9,0xFF6FB7FF); d.fill(px-5,y+1,px+5,y+14,active?0xFFFFFFFF:0xFFB8D9FF); text(d,String.valueOf(value),x+width+10,y+2,0xFF77859A,0);
+    }
     private void text(DrawContext d,String s,int x,int y,int color,int bold){ d.drawTextWithShadow(textRenderer,Text.literal(s),x,y,color); }
 
     @Override
@@ -82,26 +86,36 @@ public final class ClickGuiScreen extends Screen {
         double mx=click.x(), my=click.y(); int button=click.button();
         int x=Math.max(50,width/2-430), y=Math.max(35,height/2-255), sideW=190, pw=Math.min(860,width-100);
         if(button!=0) return super.mouseClicked(click,doubled);
-        if(mx>=x+12&&mx<=x+sideW-12) for(int i=0;i<modules.length;i++){ int by=y+98+i*48; if(my>=by&&my<=by+38){selected=i;scrollOffset=0;return true;} }
+        if(mx>=x+12&&mx<=x+sideW-12) for(int i=0;i<modules.length;i++){ int by=y+98+i*48; if(my>=by&&my<=by+38){selected=i; return true;} }
         int cx=x+sideW+26, cy=(int)(y+78+scrollOffset);
-        int toggleX=cx+pw-sideW-88, toggleY=cy-2;
-        if(mx>=toggleX-12&&mx<=toggleX+66&&my>=toggleY-8&&my<=toggleY+34){cfg().enabled=!cfg().enabled;AetherClient.saveConfig();return true;}
+        int toggleX=x+pw-sideW-88, toggleY=cy-2;
+        if(mx>=toggleX&&mx<=toggleX+54&&my>=toggleY&&my<=toggleY+26){cfg().enabled=!cfg().enabled;AetherClient.saveConfig();return true;}
         if(mx>=cx+118&&mx<=cx+246&&my>=cy+80&&my<=cy+110){ cfg().mode=nextMode(cfg().mode); AetherClient.saveConfig(); return true; }
         if(my>=cy+140&&my<=cy+164){draggingRange=true;updateSlider(mx,cx+118,250,8,128);return true;}
         if(my>=cy+188&&my<=cy+212){draggingOpacity=true;updateSlider(mx,cx+118,250,0,100);return true;}
         if(my>=cy+288&&my<=cy+312){draggingLine=true;updateSlider(mx,cx+118,250,5,40);return true;}
-        if(my>=cy+376&&my<=cy+402){ if(mx>=cx+48&&mx<=cx+143)cfg().red=(int)Math.round(Math.max(0,Math.min(1,(mx-(cx+48))/95.0))*255); else if(mx>=cx+218&&mx<=cx+313)cfg().green=(int)Math.round(Math.max(0,Math.min(1,(mx-(cx+218))/95.0))*255); else if(mx>=cx+388&&mx<=cx+483)cfg().blue=(int)Math.round(Math.max(0,Math.min(1,(mx-(cx+388))/95.0))*255); AetherClient.saveConfig(); return true; }
+        if(my>=cy+376&&my<=cy+402){
+            if(mx>=cx+48&&mx<=cx+143){cfg().red=(int)Math.round(Math.max(0,Math.min(1,(mx-(cx+48))/95.0))*255);}
+            else if(mx>=cx+218&&mx<=cx+313){cfg().green=(int)Math.round(Math.max(0,Math.min(1,(mx-(cx+218))/95.0))*255);}
+            else if(mx>=cx+388&&mx<=cx+483){cfg().blue=(int)Math.round(Math.max(0,Math.min(1,(mx-(cx+388))/95.0))*255);}
+            AetherClient.saveConfig(); return true;
+        }
         return true;
     }
     private String nextMode(String s){return switch(s){case "OUTLINE"->"CORNERS";case "CORNERS"->"FULL_BOX";default->"OUTLINE";};}
     private void updateSlider(double mx,int x,int width,int min,int max){double t=Math.max(0,Math.min(1,(mx-x)/(double)width));int v=(int)Math.round(min+t*(max-min)); if(min==8)cfg().range=v; else if(min==0)cfg().outlineOpacity=v/100f; else cfg().lineWidth=v/10f; AetherClient.saveConfig();}
-    @Override public boolean mouseDragged(Click click,double dx,double dy){double mx=click.x(); if(click.button()==0){int x=Math.max(50,width/2-430),cx=x+216;if(draggingRange)updateSlider(mx,cx-98,250,8,128);if(draggingOpacity)updateSlider(mx,cx-98,250,0,100);if(draggingLine)updateSlider(mx,cx-98,250,5,40);return true;}return super.mouseDragged(click,dx,dy);}
+    @Override public boolean mouseDragged(Click click,double dx,double dy){double mx=click.x(), my=click.y(); int button=click.button(); if(button==0){int x=Math.max(50,width/2-430),cx=x+216,cy=(int)(Math.max(35,height/2-255)+78+scrollOffset);if(draggingRange)updateSlider(mx,cx-98,250,8,128);if(draggingOpacity)updateSlider(mx,cx-98,250,0,100);if(draggingLine)updateSlider(mx,cx-98,250,5,40);return true;}return super.mouseDragged(click,dx,dy);}
     @Override public boolean mouseReleased(Click click){draggingRange=draggingOpacity=draggingLine=false;return super.mouseReleased(click);}
 
     @Override
-    public boolean mouseScrolled(double mouseX,double mouseY,double horizontalAmount,double verticalAmount){
-        scrollOffset=Math.max(-260,Math.min(0,scrollOffset+verticalAmount*32));
-        return true;
+    public boolean mouseScrolled(double mouseX, double mouseY, double horizontalAmount, double verticalAmount) {
+        int x=Math.max(50,width/2-430), y=Math.max(35,height/2-255);
+        int pw=Math.min(860,width-100), ph=Math.min(510,height-70), sideW=190;
+        if (mouseX >= x+sideW && mouseX <= x+pw && mouseY >= y+54 && mouseY <= y+ph) {
+            scrollOffset = Math.max(-220, Math.min(0, scrollOffset + verticalAmount * 28));
+            return true;
+        }
+        return super.mouseScrolled(mouseX, mouseY, horizontalAmount, verticalAmount);
     }
     @Override public boolean shouldPause(){return false;}
 }
