@@ -1,21 +1,22 @@
 package com.aetherclient.module;
 
 import com.aetherclient.AetherClient;
-import com.aetherclient.config.ClientConfig.ModuleConfig;
 import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientTickEvents;
 import net.fabricmc.fabric.api.client.keybinding.v1.KeyBindingHelper;
-import net.minecraft.client.option.KeyBinding;
 import net.minecraft.client.network.ClientPlayerEntity;
-import net.minecraft.entity.Entity;
+import net.minecraft.client.option.KeyBinding;
 import net.minecraft.entity.EntityType;
-import net.minecraft.entity.decoration.ArmorStandEntity;
+import net.minecraft.entity.MarkerEntity;
+import net.minecraft.util.Identifier;
 import net.minecraft.util.math.MathHelper;
 import org.lwjgl.glfw.GLFW;
 
 public final class Freecam {
     private static KeyBinding key;
-    private static ArmorStandEntity camera;
+    private static MarkerEntity camera;
     private static double speed = 0.8;
+    private static double savedX, savedY, savedZ;
+    private static float savedYaw, savedPitch;
 
     private Freecam() {}
 
@@ -23,32 +24,37 @@ public final class Freecam {
         key = KeyBindingHelper.registerKeyBinding(new KeyBinding(
                 "key.aetherclient.freecam",
                 GLFW.GLFW_KEY_RIGHT_ALT,
-                KeyBinding.Category.create(net.minecraft.util.Identifier.of("aetherclient", "category"))
+                KeyBinding.Category.create(Identifier.of("aetherclient", "category"))
         ));
+
         ClientTickEvents.END_CLIENT_TICK.register(client -> {
             if (client.world == null || client.player == null) return;
 
             if (key.wasPressed()) {
-                AetherClient.CONFIG.freecam.enabled = !AetherClient.CONFIG.freecam.enabled;
-                AetherClient.saveConfig();
-                if (AetherClient.CONFIG.freecam.enabled) enable(client.player);
+                if (camera == null) enable(client.player);
                 else disable(client.player);
             }
 
-            if (AetherClient.CONFIG.freecam.enabled && camera != null) tickCamera(client.player);
+            if (camera != null) tickCamera(client.player);
         });
     }
 
     private static void enable(ClientPlayerEntity player) {
-        if (camera != null) return;
-        camera = new ArmorStandEntity(EntityType.ARMOR_STAND, player.getWorld());
-        camera.setInvisible(true);
-        camera.setNoGravity(true);
-        camera.setPosition(player.getX(), player.getY(), player.getZ());
-        camera.setYaw(player.getYaw());
-        camera.setPitch(player.getPitch());
+        savedX = player.getX();
+        savedY = player.getY();
+        savedZ = player.getZ();
+        savedYaw = player.getYaw();
+        savedPitch = player.getPitch();
+
+        camera = new MarkerEntity(EntityType.MARKER, player.getWorld());
+        camera.setPosition(savedX, savedY + player.getStandingEyeHeight(), savedZ);
+        camera.setYaw(savedYaw);
+        camera.setPitch(savedPitch);
         player.getWorld().addEntity(camera);
         AetherClient.client().setCameraEntity(camera);
+
+        AetherClient.CONFIG.freecam.enabled = true;
+        AetherClient.saveConfig();
     }
 
     private static void disable(ClientPlayerEntity player) {
@@ -56,12 +62,24 @@ public final class Freecam {
             camera.discard();
             camera = null;
         }
+        player.setPosition(savedX, savedY, savedZ);
+        player.setYaw(savedYaw);
+        player.setPitch(savedPitch);
         AetherClient.client().setCameraEntity(player);
+
+        AetherClient.CONFIG.freecam.enabled = false;
+        AetherClient.saveConfig();
     }
 
     private static void tickCamera(ClientPlayerEntity player) {
         if (camera == null) return;
-        float yaw = camera.getYaw() * MathHelper.RADIANS_PER_DEGREE;
+
+        // Minecraft continues to update the player's view rotation from the mouse.
+        // We use that rotation for the detached camera, then restore the player's
+        // original rotation so the player itself does not visually turn.
+        float yaw = player.getYaw();
+        float pitch = player.getPitch();
+
         double forward = 0.0;
         double strafe = 0.0;
         var client = AetherClient.client();
@@ -77,18 +95,26 @@ public final class Freecam {
             strafe /= length;
         }
 
-        double dx = (forward * -Math.sin(yaw) + strafe * Math.cos(yaw)) * speed;
-        double dz = (forward * Math.cos(yaw) + strafe * Math.sin(yaw)) * speed;
+        double yawRad = yaw * MathHelper.RADIANS_PER_DEGREE;
+        double dx = (forward * -Math.sin(yawRad) + strafe * Math.cos(yawRad)) * speed;
+        double dz = (forward * Math.cos(yawRad) + strafe * Math.sin(yawRad)) * speed;
         double dy = 0.0;
+
         if (client.options.jumpKey.isPressed()) dy += speed;
         if (client.options.sneakKey.isPressed()) dy -= speed;
 
         camera.setPosition(camera.getX() + dx, camera.getY() + dy, camera.getZ() + dz);
-        camera.setYaw(player.getYaw());
-        camera.setPitch(player.getPitch());
+        camera.setYaw(yaw);
+        camera.setPitch(pitch);
+
+        player.setPosition(savedX, savedY, savedZ);
+        player.setYaw(savedYaw);
+        player.setPitch(savedPitch);
     }
 
     public static void shutdown() {
-        if (AetherClient.client().player != null) disable(AetherClient.client().player);
+        if (camera != null && AetherClient.client().player != null) {
+            disable(AetherClient.client().player);
+        }
     }
 }
